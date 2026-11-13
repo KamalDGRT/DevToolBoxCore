@@ -6,13 +6,13 @@ public struct ColorAsset: Equatable, Sendable {
     /// Folder relative to the catalog root; empty for root-level colorsets.
     public let folderPath: String
     public let catalogName: String
-    public let color: RGBColor
+    public let color: SRGBColor
 
     public init(
         name: String,
         folderPath: String,
         catalogName: String,
-        color: RGBColor
+        color: SRGBColor
     ) {
         self.name = name
         self.folderPath = folderPath

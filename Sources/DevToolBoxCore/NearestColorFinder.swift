@@ -12,7 +12,7 @@ public enum NearestColorFinder {
     public static let exactDeltaEThreshold = 1.0
 
     public static func nearest(
-        to target: RGBColor,
+        to target: SRGBColor,
         in assets: [ColorAsset],
         limit: Int
     ) -> [ColorMatch] {

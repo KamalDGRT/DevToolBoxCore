@@ -2,38 +2,38 @@ import Foundation
 import Testing
 @testable import DevToolBoxCore
 
-struct RGBColorTests {
+struct SRGBColorTests {
     @Test func parsesHexWithAndWithoutHash() {
-        let withHash = RGBColor(hex: "#F26522")
-        let withoutHash = RGBColor(hex: "f26522")
+        let withHash = SRGBColor(hex: "#F26522")
+        let withoutHash = SRGBColor(hex: "f26522")
         #expect(withHash == withoutHash)
         #expect(withHash?.hexString == "#F26522")
     }
 
     @Test func rejectsMalformedHex() {
-        #expect(RGBColor(hex: "#FFF") == nil)
-        #expect(RGBColor(hex: "#GGGGGG") == nil)
-        #expect(RGBColor(hex: "") == nil)
+        #expect(SRGBColor(hex: "#FFF") == nil)
+        #expect(SRGBColor(hex: "#GGGGGG") == nil)
+        #expect(SRGBColor(hex: "") == nil)
     }
 }
 
 struct ColorDistanceTests {
     @Test func identicalColorsHaveZeroDistance() throws {
-        let color = try #require(RGBColor(hex: "#004E7D"))
+        let color = try #require(SRGBColor(hex: "#004E7D"))
         #expect(ColorDistance.deltaE(color, color) == 0)
     }
 
     @Test func blackToWhiteIsAbout100() throws {
-        let black = try #require(RGBColor(hex: "#000000"))
-        let white = try #require(RGBColor(hex: "#FFFFFF"))
+        let black = try #require(SRGBColor(hex: "#000000"))
+        let white = try #require(SRGBColor(hex: "#FFFFFF"))
         let distance = ColorDistance.deltaE(black, white)
         #expect(abs(distance - 100) < 0.5, "got \(distance)")
     }
 
     @Test func nearbyColorIsCloserThanFarColor() throws {
-        let target = try #require(RGBColor(hex: "#D0D0D0"))
-        let near = try #require(RGBColor(hex: "#D1D3D6"))
-        let far = try #require(RGBColor(hex: "#004E7D"))
+        let target = try #require(SRGBColor(hex: "#D0D0D0"))
+        let near = try #require(SRGBColor(hex: "#D1D3D6"))
+        let far = try #require(SRGBColor(hex: "#004E7D"))
         #expect(
             ColorDistance.deltaE(target, near)
                 < ColorDistance.deltaE(target, far)
@@ -105,7 +105,7 @@ struct ColorAssetCatalogTests {
 
     @Test func nearestReturnsExactMatchFirst() throws {
         let assets = try ColorAssetCatalog.load(from: makeCatalog())
-        let target = try #require(RGBColor(hex: "#0061A5"))
+        let target = try #require(SRGBColor(hex: "#0061A5"))
         let matches = NearestColorFinder.nearest(to: target, in: assets, limit: 1)
         #expect(matches.count == 1)
         #expect(matches.first?.asset.name == "darkBlue")

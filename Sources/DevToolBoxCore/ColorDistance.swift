@@ -22,7 +22,7 @@ public enum ColorDistance {
     private static let labLinearSlope = 7.787
     private static let labLinearOffset = 16.0 / 116.0
 
-    public static func deltaE(_ first: RGBColor, _ second: RGBColor) -> Double {
+    public static func deltaE(_ first: SRGBColor, _ second: SRGBColor) -> Double {
         let firstLab = lab(from: first)
         let secondLab = lab(from: second)
         let lightness = firstLab.lightness - secondLab.lightness
@@ -35,7 +35,7 @@ public enum ColorDistance {
         ).squareRoot()
     }
 
-    private static func lab(from color: RGBColor) -> Lab {
+    private static func lab(from color: SRGBColor) -> Lab {
         let red = linearize(color.red)
         let green = linearize(color.green)
         let blue = linearize(color.blue)

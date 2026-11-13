@@ -44,7 +44,7 @@ public enum ColorAssetCatalog {
     }
 
     /// Prefers the universal (no `appearances`) entry over dark/high-contrast.
-    static func parseColorset(at colorsetURL: URL) throws -> RGBColor? {
+    static func parseColorset(at colorsetURL: URL) throws -> SRGBColor? {
         let contentsURL = colorsetURL.appendingPathComponent(contentsFileName)
         guard FileManager.default.fileExists(atPath: contentsURL.path) else {
             return nil
@@ -61,7 +61,7 @@ public enum ColorAssetCatalog {
               let components = colorData["components"] as? [String: Any] else {
             return nil
         }
-        return RGBColor(
+        return SRGBColor(
             red: component(components["red"]),
             green: component(components["green"]),
             blue: component(components["blue"]),

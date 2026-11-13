@@ -1,7 +1,7 @@
 import Foundation
 
 /// sRGB color with components normalized to 0.0...1.0.
-public struct RGBColor: Equatable, Sendable {
+public struct SRGBColor: Equatable, Sendable {
     public let red: Double
     public let green: Double
     public let blue: Double
