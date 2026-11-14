@@ -8,18 +8,20 @@ both, it lives here.
 
 | Type | Purpose |
 |---|---|
-| `SRGBColor` | sRGB color (0...1). Parses `#RGB`/`#RGBA`/`#RRGGBB`/`#RRGGBBAA`, validated byte init, `hexString`, `rgbString`, `flattenedOnWhite`. |
+| `SRGBColor` | sRGB color (0...1). Parses `#RGB`/`#RGBA`/`#RRGGBB`/`#RRGGBBAA`, validated byte init, `hexString`, `rgbString`, `composited(over:)`, `flattenedOnWhite`. |
 | `ColorDistance` | CIE76 ΔE between two `SRGBColor`s. |
 | `ColorAsset` | One `.colorset` (name, folder, catalog, color). |
 | `ColorAssetCatalog` | Loads every `.colorset` under an `.xcassets` directory. Prefers the universal (non-dark) entry. |
 | `NearestColorFinder` | Ranks assets by ΔE to a target color. |
+| `ColorAssetSearch` | Case-insensitive search over name, hex, RGB and folder. |
+| `DuplicateColorFinder` | Groups assets that share the same hex. |
 
 ## Install
 
 Swift Package Manager:
 
 ```swift
-.package(url: "https://github.com/KamalDGRT/DevToolBoxCore.git", from: "0.2.0")
+.package(url: "https://github.com/KamalDGRT/DevToolBoxCore.git", from: "0.3.0")
 // target dependency:
 .product(name: "DevToolBoxCore", package: "DevToolBoxCore")
 ```
@@ -47,5 +49,6 @@ consumers.
 
 | Version | Notes |
 |---|---|
+| 0.3.0 | `SRGBColor.composited(over:)`, `.white`/`.black`; `ColorAssetSearch`; `DuplicateColorFinder`. |
 | 0.2.0 | `SRGBColor` shorthand/alpha hex, validated byte init (now failable), `rgbString`, `flattenedOnWhite`, `Hashable`; `ColorAsset.displayFolderPath`. |
 | 0.1.0 | Color math, xcassets catalog parsing, nearest-color search. |

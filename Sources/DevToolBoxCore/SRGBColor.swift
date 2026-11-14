@@ -16,7 +16,6 @@ public struct SRGBColor: Hashable, Sendable {
     private static let hexRadix = 16
     private static let byteMask: UInt64 = 0xFF
     private static let bitsPerByte: UInt64 = 8
-    private static let whiteComponent = 1.0
 
     public init(red: Double, green: Double, blue: Double, alpha: Double = 1.0) {
         self.red = red
@@ -76,14 +75,21 @@ public struct SRGBColor: Hashable, Sendable {
         "RGB(\(Self.byte(red)), \(Self.byte(green)), \(Self.byte(blue)))"
     }
 
-    /// Composites this color over opaque white; the result is fully opaque.
-    public var flattenedOnWhite: SRGBColor {
+    public static let white = SRGBColor(red: 1.0, green: 1.0, blue: 1.0)
+    public static let black = SRGBColor(red: 0.0, green: 0.0, blue: 0.0)
+
+    /// Alpha-blends this color over `background`; the result is fully opaque.
+    /// The background's own alpha is ignored (treated as opaque).
+    public func composited(over background: SRGBColor) -> SRGBColor {
         SRGBColor(
-            red: red * alpha + Self.whiteComponent * (1 - alpha),
-            green: green * alpha + Self.whiteComponent * (1 - alpha),
-            blue: blue * alpha + Self.whiteComponent * (1 - alpha)
+            red: red * alpha + background.red * (1 - alpha),
+            green: green * alpha + background.green * (1 - alpha),
+            blue: blue * alpha + background.blue * (1 - alpha)
         )
     }
+
+    /// Composites this color over opaque white; the result is fully opaque.
+    public var flattenedOnWhite: SRGBColor { composited(over: .white) }
 
     private static func component(_ value: UInt64, shift: UInt64) -> Double {
         Double((value >> shift) & byteMask) / byteMax

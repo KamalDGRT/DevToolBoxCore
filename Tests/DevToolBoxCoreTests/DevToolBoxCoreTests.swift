@@ -146,3 +146,70 @@ struct ColorAssetCatalogTests {
         #expect(matches.first?.isExact == true)
     }
 }
+
+struct CompositingTests {
+    @Test func compositesOverBlackAndCustomBackground() throws {
+        let halfWhite = SRGBColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        #expect(halfWhite.composited(over: .black).hexString == "#808080")
+        let blue = try #require(SRGBColor(hex: "#0000FF"))
+        let result = halfWhite.composited(over: blue)
+        #expect(result.hexString == "#8080FF", "got \(result.hexString)")
+        #expect(result.alpha == 1.0)
+    }
+
+    @Test func opaqueColorIgnoresBackground() throws {
+        let opaque = try #require(SRGBColor(hex: "#123456"))
+        #expect(opaque.composited(over: .black) == opaque)
+    }
+}
+
+private func asset(_ name: String, _ hex: String, folder: String = "") -> ColorAsset {
+    ColorAsset(
+        name: name,
+        folderPath: folder,
+        catalogName: "T.xcassets",
+        color: SRGBColor(hex: hex)!
+    )
+}
+
+struct ColorAssetSearchTests {
+    private let assets = [
+        asset("brandBlue", "#0061A5", folder: "Brand"),
+        asset("errorRed", "#FF0000"),
+        asset("dangerRed", "#FF0000", folder: "Brand/Alerts")
+    ]
+
+    @Test func matchesNameHexRGBAndFolder() {
+        #expect(ColorAssetSearch.matching("BLUE", in: assets).map(\.name) == ["brandBlue"])
+        #expect(ColorAssetSearch.matching("ff0000", in: assets).count == 2)
+        #expect(ColorAssetSearch.matching("rgb(0, 97", in: assets).map(\.name) == ["brandBlue"])
+        #expect(ColorAssetSearch.matching("alerts", in: assets).map(\.name) == ["dangerRed"])
+        #expect(ColorAssetSearch.matching("root", in: assets).map(\.name) == ["errorRed"])
+    }
+
+    @Test func emptyQueryReturnsAll() {
+        #expect(ColorAssetSearch.matching("  ", in: assets).count == 3)
+    }
+
+    @Test func noMatchReturnsEmpty() {
+        #expect(ColorAssetSearch.matching("zzz", in: assets).isEmpty)
+    }
+}
+
+struct DuplicateColorFinderTests {
+    @Test func groupsSameHexSortedAndSkipsUniques() {
+        let groups = DuplicateColorFinder.groups(in: [
+            asset("zeta", "#FF0000"),
+            asset("alpha", "#FF0000"),
+            asset("solo", "#00FF00"),
+            asset("b", "#0000FF"),
+            asset("a", "#0000FF")
+        ])
+        #expect(groups.map(\.hex) == ["#0000FF", "#FF0000"])
+        #expect(groups[1].assets.map(\.name) == ["alpha", "zeta"])
+    }
+
+    @Test func noDuplicatesGivesEmpty() {
+        #expect(DuplicateColorFinder.groups(in: [asset("a", "#000000"), asset("b", "#111111")]).isEmpty)
+    }
+}
