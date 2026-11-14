@@ -11,9 +11,43 @@ struct SRGBColorTests {
     }
 
     @Test func rejectsMalformedHex() {
-        #expect(SRGBColor(hex: "#FFF") == nil)
+        #expect(SRGBColor(hex: "#FFFFF") == nil)
+        #expect(SRGBColor(hex: "#+12345") == nil)
         #expect(SRGBColor(hex: "#GGGGGG") == nil)
         #expect(SRGBColor(hex: "") == nil)
+    }
+}
+
+struct SRGBColorFormatTests {
+    @Test func expandsShorthandHex() {
+        #expect(SRGBColor(hex: "#F80") == SRGBColor(hex: "#FF8800"))
+        #expect(SRGBColor(hex: "#F80A") == SRGBColor(hex: "#FF8800AA"))
+    }
+
+    @Test func parsesEightDigitHexAlpha() throws {
+        let color = try #require(SRGBColor(hex: " #FF000080 "))
+        #expect(color.hexString == "#FF0000")
+        #expect(abs(color.alpha - 128.0 / 255.0) < 1e-9, "alpha \(color.alpha)")
+    }
+
+    @Test func validatesByteInit() {
+        #expect(SRGBColor(redByte: 256, greenByte: 0, blueByte: 0) == nil)
+        #expect(SRGBColor(redByte: 0, greenByte: -1, blueByte: 0) == nil)
+        #expect(SRGBColor(redByte: 0, greenByte: 0, blueByte: 0, alpha: 1.5) == nil)
+        #expect(SRGBColor(redByte: 255, greenByte: 0, blueByte: 0, alpha: 0.5)?.alpha == 0.5)
+    }
+
+    @Test func formatsRGBString() throws {
+        let color = try #require(SRGBColor(hex: "#0061A5"))
+        #expect(color.rgbString == "RGB(0, 97, 165)")
+    }
+
+    @Test func flattensAlphaOntoWhite() throws {
+        let halfBlack = SRGBColor(red: 0, green: 0, blue: 0, alpha: 0.5)
+        #expect(halfBlack.flattenedOnWhite.hexString == "#808080")
+        #expect(halfBlack.flattenedOnWhite.alpha == 1.0)
+        let opaque = try #require(SRGBColor(hex: "#123456"))
+        #expect(opaque.flattenedOnWhite == opaque)
     }
 }
 
